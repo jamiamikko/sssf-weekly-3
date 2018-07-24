@@ -98,7 +98,7 @@ app.get('/get-images', (req, res) => {
   });
 });
 
-app.post('/upload', upload, (req, res) => {
+app.put('/upload', upload, (req, res) => {
   if (!req.body || !req.file) sendStatus(400);
   const date = new Date()
     .toISOString()
@@ -138,6 +138,10 @@ app.post('/upload', upload, (req, res) => {
       console.log(err);
       res.sendStatus(400);
     });
+});
+
+app.post('/update/:id', (req, res) => {
+
 });
 
 app.delete('/delete/:id', (req, res) => {

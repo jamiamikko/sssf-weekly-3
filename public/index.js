@@ -131,7 +131,7 @@ const submitForm = (event) => {
   const formData = new FormData(eventForm);
 
   fetch('http://localhost:3000/upload', {
-    method: 'POST',
+    method: 'PUT',
     body: formData
   })
     .then((res) => {
