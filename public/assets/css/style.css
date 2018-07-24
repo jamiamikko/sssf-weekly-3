@@ -55,6 +55,17 @@ body {
         padding: 0; } }
   .thumbnail__title {
     font-size: 1.5rem; }
+  .thumbnail__delete {
+    float: right;
+    background: none;
+    border: none;
+    color: #088da5;
+    font-size: 1.2rem;
+    cursor: pointer; }
+    .thumbnail__delete:hover {
+      text-decoration: underline; }
+    .thumbnail__delete::before {
+      content: 'X'; }
 
 .hidden {
   display: none; }

@@ -78,6 +78,23 @@ body {
   &__title {
     font-size: 1.5rem;
   }
+
+  &__delete {
+    float: right;
+    background: none;
+    border: none;
+    color: $green;
+    font-size: 1.2rem;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &::before {
+      content: 'X';
+    }
+  }
 }
 
 .hidden {

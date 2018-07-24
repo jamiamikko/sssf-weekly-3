@@ -37,7 +37,7 @@ const initThumbnails = (array) => {
     description.textContent = picture.details;
 
     const li = template.content.querySelector('li');
-    li.id = picture.id;
+    li.id = picture._id;
 
     const clone = document.importNode(template.content, true);
 
@@ -117,7 +117,7 @@ const switchTab = (event) => {
 const getCoordinates = () => {
   return {
     lat: marker.getPosition().lat(),
-    lng: marker.getPosition().lng(),
+    lng: marker.getPosition().lng()
   };
 };
 
@@ -132,7 +132,7 @@ const submitForm = (event) => {
 
   fetch('http://localhost:3000/upload', {
     method: 'POST',
-    body: formData,
+    body: formData
   })
     .then((res) => {
       console.log('Success');
@@ -143,6 +143,26 @@ const submitForm = (event) => {
     .catch((err) => {
       console.log(err);
     });
+};
+
+const deleteImage = (event) => {
+  const thumbnail = event.target.parentElement;
+  const id = thumbnail.getAttribute('id');
+
+  const url = 'http://localhost:3000/delete/' + id;
+
+  fetch(url, {
+    method: 'DELETE',
+  })
+  .then((res) => {
+    console.log('Success');
+    getData().then((res) => {
+      handleData(res);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 };
 
 const getData = () =>
@@ -166,6 +186,12 @@ const handleData = (data) => {
 
   buttons.forEach((button) => {
     button.addEventListener('click', openModal, false);
+  });
+
+  const deleteButtons = document.querySelectorAll('.thumbnail__delete');
+
+  deleteButtons.forEach((button) => {
+    button.addEventListener('click', deleteImage, false);
   });
 };
 

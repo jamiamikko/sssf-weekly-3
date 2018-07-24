@@ -5,6 +5,8 @@ const multer = require('multer');
 const path = require('path');
 const sharp = require('sharp');
 const mongoose = require('mongoose');
+const fs = require('fs');
+const uuid = require('uuid/v4');
 
 console.log(
   `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${
@@ -22,7 +24,6 @@ mongoose
     {useNewUrlParser: true}
   )
   .then((res) => {
-    console.log(res);
     app.listen(port, () => console.log('Listening to port 3000'));
   })
   .catch((err) => {
@@ -40,7 +41,6 @@ db.on('error', (err) => {
 });
 
 const imgDataSchema = new mongoose.Schema({
-  id: {type: Number, required: true},
   time: {type: String, required: true},
   category: {type: String, required: true},
   title: {type: String, required: true},
@@ -56,11 +56,8 @@ const ImgData = mongoose.model('ImgData', imgDataSchema);
 const storage = multer.diskStorage({
   destination: 'public/uploads/',
   filename: (req, file, callback) => {
-    callback(
-      null,
-      file.fieldname + '-' + Date.now() + path.extname(file.originalname)
-    );
-  },
+    callback(null, uuid() + path.extname(file.originalname));
+  }
 });
 
 const upload = multer({storage: storage}).single('image');
@@ -75,13 +72,11 @@ const convertImage = (file, height, width) =>
   new Promise((resolve, reject) => {
     const newName =
       file.destination +
-      file.fieldname +
+      file.filename.split('.')[0] +
       '_' +
       height +
       'x' +
       width +
-      '-' +
-      Date.now() +
       path.extname(file.originalname);
 
     sharp(file.path)
@@ -92,18 +87,18 @@ const convertImage = (file, height, width) =>
       });
   });
 
-app.get('/get-images', (req, res, next) => {
+app.get('/get-images', (req, res) => {
   ImgData.find({}, (err, data) => {
     if (err) {
       console.log(err);
+      res.sendStatus(400);
     } else {
-      console.log(data);
       res.send(data);
     }
   });
 });
 
-app.post('/upload', upload, (req, res, next) => {
+app.post('/upload', upload, (req, res) => {
   if (!req.body || !req.file) sendStatus(400);
   const date = new Date()
     .toISOString()
@@ -111,7 +106,6 @@ app.post('/upload', upload, (req, res, next) => {
     .replace(/\..+/, '');
 
   const dataObj = {
-    id: Math.floor(Math.random() * 100 + 1),
     time: date,
     category: req.body.category,
     title: req.body.title,
@@ -144,4 +138,32 @@ app.post('/upload', upload, (req, res, next) => {
       console.log(err);
       res.sendStatus(400);
     });
+});
+
+app.delete('/delete/:id', (req, res) => {
+  const id = req.params.id;
+
+  ImgData.findOne({_id: id}, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(400);
+    } else {
+      const imagePaths = [data.original, data.thumbnail, data.image];
+
+      imagePaths.forEach((path) => {
+        fs.unlink('public/' + path, (err) => {
+          if (err) console.log(err);
+        });
+      });
+
+      ImgData.deleteOne({_id: id}, (err) => {
+        if (err) {
+          console.log(err);
+          res.sendStatus(400);
+        } else {
+          res.sendStatus(200);
+        }
+      });
+    }
+  });
 });
