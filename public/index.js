@@ -59,11 +59,11 @@ const openModal = (event) => {
 
   closeButton.addEventListener('click', toggleModalVisibility, false);
 
-  const id = parseInt(event.target.parentElement.getAttribute('id'), 10);
+  const id = event.target.parentElement.getAttribute('id');
 
   const img = modal.querySelector('.modal__image');
 
-  const dataObj = filterArray.filter((picture) => picture.id === id)[0];
+  const dataObj = filterArray.filter((picture) => picture._id === id)[0];
 
   img.src = dataObj.image;
 
