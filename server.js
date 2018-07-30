@@ -8,6 +8,11 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const uuid = require('uuid/v4');
 
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 console.log(
   `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${
     process.env.DB_HOST
@@ -48,7 +53,7 @@ const imgDataSchema = new mongoose.Schema({
   coordinates: {type: Object, required: true},
   thumbnail: String,
   image: String,
-  original: {type: String, required: true},
+  original: {type: String, required: true}
 });
 
 const ImgData = mongoose.model('ImgData', imgDataSchema);
@@ -61,12 +66,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({storage: storage}).single('image');
-const app = express();
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-
-app.use('/', express.static('public'));
 
 const convertImage = (file, height, width) =>
   new Promise((resolve, reject) => {
@@ -87,6 +86,8 @@ const convertImage = (file, height, width) =>
       });
   });
 
+app.use('/', express.static('public'));
+
 app.get('/get-images', (req, res) => {
   ImgData.find({}, (err, data) => {
     if (err) {
@@ -98,8 +99,21 @@ app.get('/get-images', (req, res) => {
   });
 });
 
+app.get('/get-images/:id', (req, res) => {
+  const id = req.params.id;
+
+  ImgData.findById(id, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(400);
+    } else {
+      res.send(data);
+    }
+  });
+});
+
 app.put('/upload', upload, (req, res) => {
-  if (!req.body || !req.file) sendStatus(400);
+  if (!req.body || !req.file) return sendStatus(400);
   const date = new Date()
     .toISOString()
     .replace(/T/, ' ')
@@ -112,9 +126,9 @@ app.put('/upload', upload, (req, res) => {
     details: req.body.description,
     coordinates: {
       lat: parseFloat(req.body.latitude),
-      lng: parseFloat(req.body.longitude),
+      lng: parseFloat(req.body.longitude)
     },
-    original: req.file.path.replace('public/', ''),
+    original: req.file.path.replace('public/', '')
   };
 
   convertImage(req.file, 320, 300)
@@ -141,7 +155,32 @@ app.put('/upload', upload, (req, res) => {
 });
 
 app.post('/update/:id', (req, res) => {
+  if (!req.body) return sendStatus(400);
 
+  const id = req.params.id;
+
+  ImgData.findById(id, (err, image) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(400);
+    } else {
+      image.set({
+        coordinates: req.body.coordinates,
+        category: req.body.category,
+        title: req.body.title,
+        details: req.body.details
+      });
+
+      image.save((err, updatedData) => {
+        if (err) {
+          console.log(err);
+          res.sendStatus(400);
+        } else {
+          res.send(updatedData);
+        }
+      });
+    }
+  });
 });
 
 app.delete('/delete/:id', (req, res) => {
