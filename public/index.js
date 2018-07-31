@@ -1,7 +1,7 @@
 'use strict';
 
-let picArray;
-let filterArray;
+let orignalArray;
+let filteredArray;
 
 const modal = document.getElementById('modal');
 const sortGirlfriendBtn = document.getElementById('sort-girlfriend');
@@ -14,8 +14,9 @@ const tabContents = document.querySelectorAll('.tab__content');
 const addImageForm = document.querySelector('#add-image');
 const inputLatitude = document.querySelector('#add-latitude');
 const inputLongitude = document.querySelector('#add-longitude');
+const searchInput = document.querySelector('#search');
 
-const initThumbnails = (array) => {
+const setThumbnails = (array) => {
   thumbnailList.innerHTML = '';
 
   for (let picture of array) {
@@ -62,7 +63,7 @@ const openViewModal = (event) => {
 
   const img = template.content.querySelector('.modal__image');
 
-  const dataObj = filterArray.filter((picture) => picture._id === id)[0];
+  const dataObj = filteredArray.filter((picture) => picture._id === id)[0];
 
   img.src = dataObj.image;
 
@@ -106,9 +107,9 @@ const submitEditForm = (event, id) => {
     method: 'POST',
     body: jsonData,
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json'
-    },
+    }
   })
     .then((data) => {
       console.log(data);
@@ -176,14 +177,14 @@ const openEditModal = (event) => {
 
 const sortArray = (category) => {
   if (category !== 'reset') {
-    filterArray = picArray.filter((picture) => {
+    filteredArray = orignalArray.filter((picture) => {
       return picture.category === category;
     });
   } else {
-    filterArray = picArray;
+    filteredArray = orignalArray;
   }
 
-  initThumbnails(filterArray);
+  setThumbnails(filteredArray);
 };
 
 const toggleDate = () => {
@@ -221,6 +222,31 @@ const getCoordinates = () => {
     lat: marker.getPosition().lat(),
     lng: marker.getPosition().lng()
   };
+};
+
+const handleData = (data) => {
+  orignalArray = data;
+  filteredArray = orignalArray;
+
+  setThumbnails(orignalArray);
+
+  const viewButtons = document.querySelectorAll('.thumbnail__view-button');
+
+  viewButtons.forEach((button) => {
+    button.addEventListener('click', openViewModal, false);
+  });
+
+  const editButtons = document.querySelectorAll('.thumbnail__edit-button');
+
+  editButtons.forEach((button) => {
+    button.addEventListener('click', openEditModal, false);
+  });
+
+  const deleteButtons = document.querySelectorAll('.thumbnail__delete');
+
+  deleteButtons.forEach((button) => {
+    button.addEventListener('click', deleteImage, false);
+  });
 };
 
 const submitForm = (event) => {
@@ -289,29 +315,22 @@ const getData = () =>
       });
   });
 
-const handleData = (data) => {
-  picArray = data;
-  filterArray = picArray;
+const filterSearch = (event) => {
+  const value = event.target.value.toLowerCase();
 
-  initThumbnails(picArray);
+  if (!value) {
+    setThumbnails(orignalArray);
+  } else {
+    const searchArray = filteredArray.filter((image) => {
+      return (
+        image.category.toLowerCase().includes(value) ||
+        image.details.toLowerCase().includes(value) ||
+        image.title.toLowerCase().includes(value)
+      );
+    });
 
-  const viewButtons = document.querySelectorAll('.thumbnail__view-button');
-
-  viewButtons.forEach((button) => {
-    button.addEventListener('click', openViewModal, false);
-  });
-
-  const editButtons = document.querySelectorAll('.thumbnail__edit-button');
-
-  editButtons.forEach((button) => {
-    button.addEventListener('click', openEditModal, false);
-  });
-
-  const deleteButtons = document.querySelectorAll('.thumbnail__delete');
-
-  deleteButtons.forEach((button) => {
-    button.addEventListener('click', deleteImage, false);
-  });
+    setThumbnails(searchArray);
+  }
 };
 
 const init = () => {
@@ -351,6 +370,7 @@ const init = () => {
 
   displayDateBtn.addEventListener('click', toggleDate, false);
   addImageForm.addEventListener('submit', submitForm, false);
+  searchInput.addEventListener('input', filterSearch, false);
 };
 
 init();

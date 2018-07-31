@@ -8,6 +8,38 @@
     display: block;
     clear: both; }
 
+.form input,
+.form textarea {
+  clear: both;
+  display: block;
+  margin-bottom: 2rem;
+  min-height: 2rem;
+  width: 100%; }
+
+.container--half {
+  width: 49%;
+  float: left;
+  list-style-type: none;
+  margin-bottom: 1rem; }
+  .container--half:not(:nth-child(3n)) {
+    margin-right: 1%; }
+  @media only screen and (max-width: 700px) {
+    .container--half {
+      width: 100%;
+      float: none; } }
+
+.thumbnail {
+  width: 32%;
+  float: left;
+  list-style-type: none;
+  margin-bottom: 1rem; }
+  .thumbnail:not(:nth-child(3n)) {
+    margin-right: 1%; }
+  @media only screen and (max-width: 700px) {
+    .thumbnail {
+      width: 100%;
+      float: none; } }
+
 body {
   margin: 0;
   padding: 0;
@@ -35,37 +67,28 @@ body {
     color: #088da5;
     text-decoration: underline; }
 
-.thumbnail {
-  width: 32%;
-  float: left;
-  list-style-type: none;
-  margin-bottom: 1rem; }
-  .thumbnail:not(:nth-child(3n)) {
-    margin-right: 1%; }
+.thumbnail__list {
+  height: auto;
+  clear: both;
+  margin: 2rem 0 0; }
   @media only screen and (max-width: 700px) {
-    .thumbnail {
-      width: 100%;
-      float: none; } }
-  .thumbnail__list {
-    height: auto;
-    clear: both;
-    margin: 0; }
-    @media only screen and (max-width: 700px) {
-      .thumbnail__list {
-        padding: 0; } }
-  .thumbnail__title {
-    font-size: 1.5rem; }
-  .thumbnail__delete {
-    float: right;
-    background: none;
-    border: none;
-    color: #088da5;
-    font-size: 1.2rem;
-    cursor: pointer; }
-    .thumbnail__delete:hover {
-      text-decoration: underline; }
-    .thumbnail__delete::before {
-      content: 'X'; }
+    .thumbnail__list {
+      padding: 0; } }
+
+.thumbnail__title {
+  font-size: 1.5rem; }
+
+.thumbnail__delete {
+  float: right;
+  background: none;
+  border: none;
+  color: #088da5;
+  font-size: 1.2rem;
+  cursor: pointer; }
+  .thumbnail__delete:hover {
+    text-decoration: underline; }
+  .thumbnail__delete::before {
+    content: 'X'; }
 
 .hidden {
   display: none; }
@@ -130,10 +153,6 @@ img {
   clear: both;
   display: block; }
 
-.form input,
-.form textarea {
-  clear: both;
-  display: block;
-  margin-bottom: 2rem;
-  width: 50%;
-  min-height: 2rem; }
+.form input.half,
+.form textarea.half {
+  width: 50%; }

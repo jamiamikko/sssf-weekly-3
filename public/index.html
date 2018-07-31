@@ -16,19 +16,23 @@
         <section class="tab__wrapper">
             <div id="view" class="tab__content open">
                 <section class="container">
-                    <div>
+                    <div class="container--half">
                         <h3>Sort by category:</h3>
                         <button class="button" id="sort-wife">Wife</button>
                         <button class="button" id="sort-girlfriend">Girlfriend</button>
                         <button class="button" id="sort-reset">All</button>
+                    </div>
+                    <div class="container--half">
+                        <h3>Search</h3>
+                        <form class="form">
+                            <input type="text" id="search" placeholder="Search by category, title or details">
+                        </form>
                     </div>
                 </section>
                 <section class="container">
                     <div>
                         <button class="button" id="display-date">Date on</button>
                     </div>
-                </section>
-                <section class="container">
                     <ul id="thumbnail-list" class="thumbnail__list">
                     </ul>
                 </section>
@@ -58,11 +62,11 @@
                             <input id="edit-latitude" type="hidden" name="latitude">
                             <input id="edit-longitude" type="hidden" name="longitude">
                             <label for="category">Category</label>
-                            <input type="text" id="edit-category" name="category">
+                            <input class="half" type="text" id="edit-category" name="category">
                             <label for="title">Title</label>
-                            <input type="text" id="edit-title" name="title">
+                            <input class="half" type="text" id="edit-title" name="title">
                             <label for="description">Description</label>
-                            <textarea id="edit-description" name="description"></textarea>
+                            <textarea class="half" id="edit-description" name="description"></textarea>
                             <button class="button" type="submit">Save</button>
                         </form>
                     </div>
@@ -76,11 +80,11 @@
                         <input id="add-latitude" type="hidden" name="latitude">
                         <input id="add-longitude" type="hidden" name="longitude">
                         <label for="category">Category</label>
-                        <input type="text" id="add-category" name="category">
+                        <input class="half" type="text" id="add-category" name="category">
                         <label for="title">Title</label>
-                        <input type="text" id="add-title" name="title">
+                        <input class="half" type="text" id="add-title" name="title">
                         <label for="description">Description</label>
-                        <textarea id="add-description" name="description"></textarea>
+                        <textarea class="half" id="add-description" name="description"></textarea>
                         <label for="image">Image</label>
                         <input id="add-image" name="image" type="file">
                         <button class="button" type="submit">Submit</button>

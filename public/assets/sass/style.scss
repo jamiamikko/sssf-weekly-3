@@ -16,6 +16,46 @@ $grey: #ccc;
   }
 }
 
+%input-base {
+  clear: both;
+  display: block;
+  margin-bottom: 2rem;
+  min-height: 2rem;
+  width: 100%;
+}
+
+%g-half {
+  width: 49%;
+  float: left;
+  list-style-type: none;
+  margin-bottom: 1rem;
+
+  &:not(:nth-child(3n)) {
+    margin-right: 1%;
+  }
+
+  @media only screen and (max-width: 700px) {
+    width: 100%;
+    float: none;
+  }
+}
+
+%g-third {
+  width: 32%;
+  float: left;
+  list-style-type: none;
+  margin-bottom: 1rem;
+
+  &:not(:nth-child(3n)) {
+    margin-right: 1%;
+  }
+
+  @media only screen and (max-width: 700px) {
+    width: 100%;
+    float: none;
+  }
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -51,24 +91,12 @@ body {
 }
 
 .thumbnail {
-  width: 32%;
-  float: left;
-  list-style-type: none;
-  margin-bottom: 1rem;
-
-  &:not(:nth-child(3n)) {
-    margin-right: 1%;
-  }
-
-  @media only screen and (max-width: 700px) {
-    width: 100%;
-    float: none;
-  }
+  @extend %g-third;
 
   &__list {
     height: auto;
     clear: both;
-    margin: 0;
+    margin: 2rem 0 0;
 
     @media only screen and (max-width: 700px) {
       padding: 0;
@@ -103,6 +131,10 @@ body {
 
 .container {
   @extend %container-base;
+
+  &--half {
+    @extend %g-half;
+  }
 }
 
 img {
@@ -191,10 +223,10 @@ img {
   }
   input,
   textarea {
-    clear: both;
-    display: block;
-    margin-bottom: 2rem;
-    width: 50%;
-    min-height: 2rem;
+    @extend %input-base;
+    
+    &.half {
+      width: 50%;
+    }
   }
 }
