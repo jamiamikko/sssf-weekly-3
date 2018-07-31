@@ -7,17 +7,28 @@ const sharp = require('sharp');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const uuid = require('uuid/v4');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-console.log(
-  `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${
-    process.env.DB_HOST
-  }:${process.env.DB_PORT}/test`
+passport.use(
+  new LocalStrategy((username, password, done) => {
+    if (
+      username !== process.env.username ||
+      password !== process.env.password
+    ) {
+      done(null, false, {message: 'Incorrect credentials'});
+      return;
+    }
+    return done(null, {});
+  })
 );
+
+app.use(passport.initialize());
 
 const port = process.env.PORT || 3000;
 
@@ -196,6 +207,15 @@ app.post('/update/:id', (req, res) => {
     }
   });
 });
+
+app.post(
+  '/login',
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/test',
+    session: false,
+  })
+);
 
 app.delete('/delete/:id', (req, res) => {
   const id = req.params.id;
