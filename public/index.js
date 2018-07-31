@@ -293,6 +293,17 @@ const deleteImage = (event) => {
     });
 };
 
+const getDataBySearch = (title) =>
+  new Promise((resolve, reject) => {
+    fetch('http://localhost:3000/search?title=' + title)
+      .then((res) => {
+        resolve(res.json());
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+
 const getDataById = (id) =>
   new Promise((resolve, reject) => {
     fetch('http://localhost:3000/get-images/' + id)
@@ -319,17 +330,21 @@ const filterSearch = (event) => {
   const value = event.target.value.toLowerCase();
 
   if (!value) {
-    setThumbnails(orignalArray);
+    getData()
+      .then((res) => {
+        handleData(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   } else {
-    const searchArray = filteredArray.filter((image) => {
-      return (
-        image.category.toLowerCase().includes(value) ||
-        image.details.toLowerCase().includes(value) ||
-        image.title.toLowerCase().includes(value)
-      );
-    });
-
-    setThumbnails(searchArray);
+    getDataBySearch(value)
+      .then((res) => {
+        handleData(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 };
 

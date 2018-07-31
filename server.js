@@ -10,7 +10,7 @@ const uuid = require('uuid/v4');
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 console.log(
@@ -107,6 +107,20 @@ app.get('/get-images/:id', (req, res) => {
       console.log(err);
       res.sendStatus(400);
     } else {
+      res.send(data);
+    }
+  });
+});
+
+app.get('/search', (req, res) => {
+  const title = req.query.title;
+
+  ImgData.find({title: {$regex: title, $options: 'i'}}, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(400);
+    } else {
+      console.log(data);
       res.send(data);
     }
   });
