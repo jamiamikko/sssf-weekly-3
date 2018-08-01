@@ -64,3 +64,4 @@ typings/
 .eslintrc.js
 .DS_Store
 public/uploads
+config

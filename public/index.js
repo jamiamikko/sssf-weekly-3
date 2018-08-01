@@ -103,7 +103,7 @@ const submitEditForm = (event, id) => {
 
   console.log(jsonData);
 
-  fetch('http://localhost:3000/update/' + id, {
+  fetch('https://localhost:3000/update/' + id, {
     method: 'POST',
     body: jsonData,
     headers: {
@@ -258,7 +258,7 @@ const submitForm = (event) => {
 
   const formData = new FormData(addImageForm);
 
-  fetch('http://localhost:3000/upload', {
+  fetch('https://localhost:3000/upload', {
     method: 'PUT',
     body: formData
   })
@@ -277,7 +277,7 @@ const deleteImage = (event) => {
   const thumbnail = event.target.parentElement;
   const id = thumbnail.getAttribute('id');
 
-  const url = 'http://localhost:3000/delete/' + id;
+  const url = 'https://localhost:3000/delete/' + id;
 
   fetch(url, {
     method: 'DELETE'
@@ -295,7 +295,7 @@ const deleteImage = (event) => {
 
 const getDataBySearch = (title) =>
   new Promise((resolve, reject) => {
-    fetch('http://localhost:3000/search?title=' + title)
+    fetch('https://localhost:3000/search?title=' + title)
       .then((res) => {
         resolve(res.json());
       })
@@ -306,7 +306,7 @@ const getDataBySearch = (title) =>
 
 const getDataById = (id) =>
   new Promise((resolve, reject) => {
-    fetch('http://localhost:3000/get-images/' + id)
+    fetch('https://localhost:3000/get-images/' + id)
       .then((res) => {
         resolve(res.json());
       })
@@ -317,7 +317,7 @@ const getDataById = (id) =>
 
 const getData = () =>
   new Promise((resolve, reject) => {
-    fetch('http://localhost:3000/get-images')
+    fetch('https://localhost:3000/get-images')
       .then((res) => {
         resolve(res.json());
       })
@@ -347,6 +347,7 @@ const filterSearch = (event) => {
       });
   }
 };
+
 
 const init = () => {
   getData()

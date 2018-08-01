@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const https = require('https');
+const http = require('http');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const path = require('path');
@@ -7,30 +9,57 @@ const sharp = require('sharp');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const uuid = require('uuid/v4');
+const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 const app = express();
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
-
 passport.use(
   new LocalStrategy((username, password, done) => {
     if (
-      username !== process.env.username ||
-      password !== process.env.password
+      username !== process.env.USERNAME ||
+      password !== process.env.PASSWORD
     ) {
       done(null, false, {message: 'Incorrect credentials'});
       return;
     }
-    return done(null, {});
+    return done(null, {username: username});
+  })
+);
+
+passport.serializeUser((user, done) => {
+  console.log(user);
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  console.log(user);
+  done(null, user);
+});
+
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: true,
+    saveUninitialized: true
   })
 );
 
 app.use(passport.initialize());
+app.use(passport.session());
 
-const port = process.env.PORT || 3000;
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+const sslkey = fs.readFileSync('./config/ssl-key.pem');
+const sslcert = fs.readFileSync('./config/ssl-cert.pem');
+
+const options = {
+  key: sslkey,
+  cert: sslcert
+};
 
 mongoose
   .connect(
@@ -40,7 +69,14 @@ mongoose
     {useNewUrlParser: true}
   )
   .then((res) => {
-    app.listen(port, () => console.log('Listening to port 3000'));
+    console.log('Mongodb connected');
+    https.createServer(options, app).listen(3000);
+    http
+      .createServer((req, res) => {
+        res.writeHead(301, {Location: 'https://localhost:3000' + req.url});
+        res.end();
+      })
+      .listen(8080);
   })
   .catch((err) => {
     console.log(err);
@@ -77,27 +113,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({storage: storage}).single('image');
-
-const convertImage = (file, height, width) =>
-  new Promise((resolve, reject) => {
-    const newName =
-      file.destination +
-      file.filename.split('.')[0] +
-      '_' +
-      height +
-      'x' +
-      width +
-      path.extname(file.originalname);
-
-    sharp(file.path)
-      .resize(height, width)
-      .toFile(newName, (err, info) => {
-        if (err) reject(err);
-        else resolve(newName);
-      });
-  });
-
-app.use('/', express.static('public'));
 
 app.get('/get-images', (req, res) => {
   ImgData.find({}, (err, data) => {
@@ -136,6 +151,25 @@ app.get('/search', (req, res) => {
     }
   });
 });
+
+const convertImage = (file, height, width) =>
+  new Promise((resolve, reject) => {
+    const newName =
+      file.destination +
+      file.filename.split('.')[0] +
+      '_' +
+      height +
+      'x' +
+      width +
+      path.extname(file.originalname);
+
+    sharp(file.path)
+      .resize(height, width)
+      .toFile(newName, (err, info) => {
+        if (err) reject(err);
+        else resolve(newName);
+      });
+  });
 
 app.put('/upload', upload, (req, res) => {
   if (!req.body || !req.file) return sendStatus(400);
@@ -212,8 +246,7 @@ app.post(
   '/login',
   passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/test',
-    session: false,
+    failureRedirect: '/test'
   })
 );
 
