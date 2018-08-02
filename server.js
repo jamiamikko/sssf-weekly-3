@@ -1,18 +1,20 @@
+'use strict';
+
 require('dotenv').config();
-const express = require('express');
 const https = require('https');
 const http = require('http');
+const fs = require('fs');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 const multer = require('multer');
 const path = require('path');
 const sharp = require('sharp');
 const mongoose = require('mongoose');
-const fs = require('fs');
 const uuid = require('uuid/v4');
-const session = require('express-session');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 
+const express = require('express');
 const app = express();
 
 passport.use(
@@ -29,12 +31,12 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  console.log(user);
+  console.log(`Serialize user: ${user.username}`);
   done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
-  console.log(user);
+  console.log(`Deserialize user: ${user.username}`);
   done(null, user);
 });
 
@@ -61,6 +63,14 @@ const options = {
   cert: sslcert
 };
 
+https.createServer(options, app).listen(3000);
+http
+  .createServer((req, res) => {
+    res.writeHead(301, {Location: 'https://localhost:3000' + req.url});
+    res.end();
+  })
+  .listen(8080);
+
 mongoose
   .connect(
     `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${
@@ -68,16 +78,7 @@ mongoose
     }:${process.env.DB_PORT}/test`,
     {useNewUrlParser: true}
   )
-  .then((res) => {
-    console.log('Mongodb connected');
-    https.createServer(options, app).listen(3000);
-    http
-      .createServer((req, res) => {
-        res.writeHead(301, {Location: 'https://localhost:3000' + req.url});
-        res.end();
-      })
-      .listen(8080);
-  })
+  .then(() => {})
   .catch((err) => {
     console.log(err);
   });
@@ -246,7 +247,7 @@ app.post(
   '/login',
   passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/test'
+    failureRedirect: '/login.html'
   })
 );
 
