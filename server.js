@@ -44,7 +44,7 @@ app.use(
   session({
     secret: process.env.SECRET,
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
   })
 );
 
@@ -60,7 +60,7 @@ const sslcert = fs.readFileSync('./config/ssl-cert.pem');
 
 const options = {
   key: sslkey,
-  cert: sslcert
+  cert: sslcert,
 };
 
 https.createServer(options, app).listen(3000);
@@ -101,7 +101,7 @@ const imgDataSchema = new mongoose.Schema({
   coordinates: {type: Object, required: true},
   thumbnail: String,
   image: String,
-  original: {type: String, required: true}
+  original: {type: String, required: true},
 });
 
 const ImgData = mongoose.model('ImgData', imgDataSchema);
@@ -110,7 +110,7 @@ const storage = multer.diskStorage({
   destination: 'public/uploads/',
   filename: (req, file, callback) => {
     callback(null, uuid() + path.extname(file.originalname));
-  }
+  },
 });
 
 const upload = multer({storage: storage}).single('image');
@@ -186,9 +186,9 @@ app.put('/upload', upload, (req, res) => {
     details: req.body.description,
     coordinates: {
       lat: parseFloat(req.body.latitude),
-      lng: parseFloat(req.body.longitude)
+      lng: parseFloat(req.body.longitude),
     },
-    original: req.file.path.replace('public/', '')
+    original: req.file.path.replace('public/', ''),
   };
 
   convertImage(req.file, 320, 300)
@@ -228,7 +228,7 @@ app.post('/update/:id', (req, res) => {
         coordinates: req.body.coordinates,
         category: req.body.category,
         title: req.body.title,
-        details: req.body.details
+        details: req.body.details,
       });
 
       image.save((err, updatedData) => {
@@ -247,7 +247,7 @@ app.post(
   '/login',
   passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/login.html'
+    failureRedirect: '/login.html',
   })
 );
 
